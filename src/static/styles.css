@@ -239,6 +239,33 @@ section h3 {
   letter-spacing: 0.3px;
 }
 
+/* Difficulty Badge */
+.difficulty-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 3px 8px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 6px;
+}
+
+.difficulty-badge.beginner {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.difficulty-badge.intermediate {
+  background-color: #fff3e0;
+  color: #e65100;
+}
+
+.difficulty-badge.advanced {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
 /* Capacity Indicator */
 .capacity-container {
   margin: 8px 0;
@@ -573,7 +600,8 @@ footer {
 
 .category-filters,
 .day-filters,
-.time-filters {
+.time-filters,
+.difficulty-filters {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
@@ -581,7 +609,8 @@ footer {
 
 .category-filter,
 .day-filter,
-.time-filter {
+.time-filter,
+.difficulty-filter {
   background-color: var(--background);
   border: 1px solid var(--border);
   color: var(--text-primary);
@@ -594,7 +623,8 @@ footer {
 
 .category-filter.active,
 .day-filter.active,
-.time-filter.active {
+.time-filter.active,
+.difficulty-filter.active {
   background-color: var(--primary);
   color: white;
   border-color: var(--primary-dark);
@@ -602,7 +632,8 @@ footer {
 
 .category-filter:hover,
 .day-filter:hover,
-.time-filter:hover {
+.time-filter:hover,
+.difficulty-filter:hover {
   background-color: var(--primary-light);
   color: white;
 }
@@ -741,4 +772,71 @@ body.dark-mode .skeleton-line {
 body.dark-mode .tooltip .tooltip-text {
   background-color: var(--surface);
   color: var(--text-primary);
+}
+
+/* Social Sharing Buttons */
+.share-buttons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-light);
+}
+
+.share-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-right: 2px;
+}
+
+.share-btn {
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  min-width: 32px;
+  justify-content: center;
+}
+
+.share-btn:hover {
+  background-color: var(--primary-light);
+  border-color: var(--primary);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.share-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* Specific hover colors for each share button */
+.share-facebook:hover {
+  background-color: #1877f2;
+  border-color: #1877f2;
+}
+
+.share-twitter:hover {
+  background-color: #1da1f2;
+  border-color: #1da1f2;
+}
+
+.share-email:hover {
+  background-color: #ea4335;
+  border-color: #ea4335;
+}
+
+.share-copy:hover {
+  background-color: #5f6368;
+  border-color: #5f6368;
 }

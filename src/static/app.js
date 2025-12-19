@@ -44,6 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const categoryFilters = document.querySelectorAll(".category-filter");
   const dayFilters = document.querySelectorAll(".day-filter");
   const timeFilters = document.querySelectorAll(".time-filter");
+  const difficultyFilters = document.querySelectorAll(".difficulty-filter");
 
   // Authentication elements
   const loginButton = document.getElementById("login-button");
@@ -70,6 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let searchQuery = "";
   let currentDay = "";
   let currentTimeRange = "";
+  let currentDifficulty = "";
 
   // Authentication state
   let currentUser = null;
@@ -93,6 +95,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const activeTimeFilter = document.querySelector(".time-filter.active");
     if (activeTimeFilter) {
       currentTimeRange = activeTimeFilter.dataset.time;
+    }
+
+    // Initialize difficulty filter
+    const activeDifficultyFilter = document.querySelector(".difficulty-filter.active");
+    if (activeDifficultyFilter) {
+      currentDifficulty = activeDifficultyFilter.dataset.difficulty;
     }
   }
 
@@ -119,6 +127,22 @@ document.addEventListener("DOMContentLoaded", () => {
     // Update active class
     timeFilters.forEach((btn) => {
       if (btn.dataset.time === timeRange) {
+        btn.classList.add("active");
+      } else {
+        btn.classList.remove("active");
+      }
+    });
+
+    fetchActivities();
+  }
+
+  // Function to set difficulty filter
+  function setDifficultyFilter(difficulty) {
+    currentDifficulty = difficulty;
+
+    // Update active class
+    difficultyFilters.forEach((btn) => {
+      if (btn.dataset.difficulty === difficulty) {
         btn.classList.add("active");
       } else {
         btn.classList.remove("active");
@@ -422,6 +446,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
+      // Handle difficulty filter
+      if (currentDifficulty) {
+        queryParams.push(`difficulty=${encodeURIComponent(currentDifficulty)}`);
+      }
+
       const queryString =
         queryParams.length > 0 ? `?${queryParams.join("&")}` : "";
       const response = await fetch(`/activities${queryString}`);
@@ -549,9 +578,15 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `;
 
+    // Create difficulty badge (only if difficulty is specified)
+    const difficultyBadge = details.difficulty
+      ? `<span class="difficulty-badge ${details.difficulty.toLowerCase()}">${details.difficulty}</span>`
+      : "";
+
     activityCard.innerHTML = `
       ${tagHtml}
       <h4>${name}</h4>
+      ${difficultyBadge}
       <p>${details.description}</p>
       <p class="tooltip">
         <strong>Schedule:</strong> ${formattedSchedule}
@@ -582,6 +617,25 @@ document.addEventListener("DOMContentLoaded", () => {
             .join("")}
         </ul>
       </div>
+      <div class="share-buttons">
+        <span class="share-label">Share:</span>
+        <button class="share-btn share-facebook tooltip" data-activity="${name}">
+          <span class="share-icon">📘</span>
+          <span class="tooltip-text">Share on Facebook</span>
+        </button>
+        <button class="share-btn share-twitter tooltip" data-activity="${name}">
+          <span class="share-icon">🐦</span>
+          <span class="tooltip-text">Share on Twitter</span>
+        </button>
+        <button class="share-btn share-email tooltip" data-activity="${name}">
+          <span class="share-icon">📧</span>
+          <span class="tooltip-text">Share via Email</span>
+        </button>
+        <button class="share-btn share-copy tooltip" data-activity="${name}">
+          <span class="share-icon">🔗</span>
+          <span class="tooltip-text">Copy link to clipboard</span>
+        </button>
+      </div>
       <div class="activity-card-actions">
         ${
           currentUser
@@ -605,6 +659,25 @@ document.addEventListener("DOMContentLoaded", () => {
     const deleteButtons = activityCard.querySelectorAll(".delete-participant");
     deleteButtons.forEach((button) => {
       button.addEventListener("click", handleUnregister);
+    });
+
+    // Add click handlers for share buttons
+    const shareButtons = activityCard.querySelectorAll(".share-btn");
+    shareButtons.forEach((button) => {
+      button.addEventListener("click", (e) => {
+        const activityName = e.currentTarget.dataset.activity;
+        const activityDetails = allActivities[activityName];
+        
+        if (e.currentTarget.classList.contains("share-facebook")) {
+          shareToFacebook(activityName, activityDetails);
+        } else if (e.currentTarget.classList.contains("share-twitter")) {
+          shareToTwitter(activityName, activityDetails);
+        } else if (e.currentTarget.classList.contains("share-email")) {
+          shareViaEmail(activityName, activityDetails);
+        } else if (e.currentTarget.classList.contains("share-copy")) {
+          copyLinkToClipboard(activityName);
+        }
+      });
     });
 
     // Add click handler for register button (only when authenticated)
@@ -667,6 +740,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Update current time filter and fetch activities
       currentTimeRange = button.dataset.time;
+      fetchActivities();
+    });
+  });
+
+  // Add event listeners for difficulty filter buttons
+  difficultyFilters.forEach((button) => {
+    button.addEventListener("click", () => {
+      // Update active class
+      difficultyFilters.forEach((btn) => btn.classList.remove("active"));
+      button.classList.add("active");
+
+      // Update current difficulty filter and fetch activities
+      currentDifficulty = button.dataset.difficulty;
       fetchActivities();
     });
   });
@@ -889,7 +975,84 @@ document.addEventListener("DOMContentLoaded", () => {
   window.activityFilters = {
     setDayFilter,
     setTimeRangeFilter,
+    setDifficultyFilter,
   };
+
+  // Social sharing functions
+  function getActivityUrl() {
+    // Generate a URL for the activity - using current page URL as base
+    // For simplicity, we use the base URL. In a production app, you might have activity-specific URLs
+    const baseUrl = window.location.origin + window.location.pathname;
+    return baseUrl;
+  }
+
+  function shareToFacebook(activityName, details) {
+    const url = getActivityUrl();
+    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(`Check out ${activityName} at Mergington High School! ${details.description}`)}`;
+    window.open(shareUrl, '_blank', 'width=600,height=400');
+  }
+
+  function shareToTwitter(activityName, details) {
+    const url = getActivityUrl();
+    const text = `Check out ${activityName} at Mergington High School! ${details.description}`;
+    const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+    window.open(shareUrl, '_blank', 'width=600,height=400');
+  }
+
+  function shareViaEmail(activityName, details) {
+    const url = getActivityUrl();
+    const subject = `Check out ${activityName} at Mergington High School`;
+    const body = `Hi!
+
+I wanted to share this great activity with you:
+
+${activityName}
+${details.description}
+
+Schedule: ${formatSchedule(details)}
+
+Learn more at: ${url}`;
+    
+    const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoUrl;
+  }
+
+  function copyLinkToClipboard(activityName) {
+    const url = getActivityUrl();
+    
+    // Modern clipboard API
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(() => {
+        showMessage(`Link copied to clipboard! Share ${activityName} with your friends.`, 'success');
+      }).catch(err => {
+        console.error('Failed to copy:', err);
+        fallbackCopyToClipboard(url, activityName);
+      });
+    } else {
+      fallbackCopyToClipboard(url, activityName);
+    }
+  }
+
+  function fallbackCopyToClipboard(text, activityName) {
+    // Fallback for older browsers using deprecated execCommand
+    // Note: document.execCommand is deprecated but maintained for legacy browser support
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.select();
+    
+    try {
+      document.execCommand('copy');
+      showMessage(`Link copied to clipboard! Share ${activityName} with your friends.`, 'success');
+    } catch (err) {
+      console.error('Fallback copy failed:', err);
+      showMessage('Failed to copy link. Please copy manually.', 'error');
+    }
+    
+    document.body.removeChild(textArea);
+  }
 
   // Initialize app
   checkAuthentication();
