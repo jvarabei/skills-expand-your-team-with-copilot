@@ -726,7 +726,7 @@ footer {
 /* Dark mode specific adjustments */
 body.dark-mode .activity-tag {
   background: rgba(92, 107, 192, 0.2);
-  color: #8e99f3;
+  color: var(--primary-light);
 }
 
 body.dark-mode .skeleton-line {
@@ -739,6 +739,6 @@ body.dark-mode .skeleton-line {
 }
 
 body.dark-mode .tooltip .tooltip-text {
-  background-color: rgba(240, 240, 240, 0.95);
-  color: #121212;
+  background-color: var(--surface);
+  color: var(--text-primary);
 }
