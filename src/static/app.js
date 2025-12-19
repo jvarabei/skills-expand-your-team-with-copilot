@@ -554,19 +554,19 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
       <div class="share-buttons">
         <span class="share-label">Share:</span>
-        <button class="share-btn share-facebook tooltip" data-activity="${name}" title="Share on Facebook">
+        <button class="share-btn share-facebook tooltip" data-activity="${name}">
           <span class="share-icon">📘</span>
           <span class="tooltip-text">Share on Facebook</span>
         </button>
-        <button class="share-btn share-twitter tooltip" data-activity="${name}" title="Share on Twitter">
+        <button class="share-btn share-twitter tooltip" data-activity="${name}">
           <span class="share-icon">🐦</span>
           <span class="tooltip-text">Share on Twitter</span>
         </button>
-        <button class="share-btn share-email tooltip" data-activity="${name}" title="Share via Email">
+        <button class="share-btn share-email tooltip" data-activity="${name}">
           <span class="share-icon">📧</span>
           <span class="tooltip-text">Share via Email</span>
         </button>
-        <button class="share-btn share-copy tooltip" data-activity="${name}" title="Copy link">
+        <button class="share-btn share-copy tooltip" data-activity="${name}">
           <span class="share-icon">🔗</span>
           <span class="tooltip-text">Copy link to clipboard</span>
         </button>
@@ -900,29 +900,28 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Social sharing functions
-  function getActivityUrl(activityName) {
+  function getActivityUrl() {
     // Generate a URL for the activity - using current page URL as base
+    // For simplicity, we use the base URL. In a production app, you might have activity-specific URLs
     const baseUrl = window.location.origin + window.location.pathname;
-    // For a simple implementation, we'll use the base URL
-    // In a real app, you might have activity-specific URLs
     return baseUrl;
   }
 
   function shareToFacebook(activityName, details) {
-    const url = getActivityUrl(activityName);
+    const url = getActivityUrl();
     const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(`Check out ${activityName} at Mergington High School! ${details.description}`)}`;
     window.open(shareUrl, '_blank', 'width=600,height=400');
   }
 
   function shareToTwitter(activityName, details) {
-    const url = getActivityUrl(activityName);
+    const url = getActivityUrl();
     const text = `Check out ${activityName} at Mergington High School! ${details.description}`;
     const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
     window.open(shareUrl, '_blank', 'width=600,height=400');
   }
 
   function shareViaEmail(activityName, details) {
-    const url = getActivityUrl(activityName);
+    const url = getActivityUrl();
     const subject = `Check out ${activityName} at Mergington High School`;
     const body = `Hi!
 
@@ -940,7 +939,7 @@ Learn more at: ${url}`;
   }
 
   function copyLinkToClipboard(activityName) {
-    const url = getActivityUrl(activityName);
+    const url = getActivityUrl();
     
     // Modern clipboard API
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -956,7 +955,8 @@ Learn more at: ${url}`;
   }
 
   function fallbackCopyToClipboard(text, activityName) {
-    // Fallback for older browsers
+    // Fallback for older browsers using deprecated execCommand
+    // Note: document.execCommand is deprecated but maintained for legacy browser support
     const textArea = document.createElement('textarea');
     textArea.value = text;
     textArea.style.position = 'fixed';
